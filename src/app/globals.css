@@ -15,10 +15,13 @@
   }
 }
 
+
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(6, 0, 24);
-  background: radial-gradient(circle, rgba(6, 0, 24, 1) 30%, rgba(0, 0, 0, 1) 100%);
+  background: rgb(0, 0, 0);
+  color: var(--foreground-rgb);
+  /* background: rgb(6, 0, 24);
+  background: radial-gradient(circle, rgba(6, 0, 24, 1) 30%, rgba(0, 0, 0, 1) 100%); */
+  background-image: url("../../public/background.jpg");
 }
 
 @layer utilities {
