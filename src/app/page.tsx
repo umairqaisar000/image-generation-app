@@ -19,8 +19,6 @@ export default function Home() {
       setIsLoading(true);
       setImageUrl("");
 
-
-
       if (!user) {
         throw new Error("User is not authenticated");
       }
@@ -44,12 +42,12 @@ export default function Home() {
         }
 
         const uploadResult = await uploadResponse.json();
-        const imageUrl = uploadResult.secure_url;
-        setImageUrl(imageUrl);
+        const imageId = uploadResult.public_id;
+        setImageUrl(uploadResult.secure_url);
 
         // Save image URL to Firebase
-        const imageRef = ref(database, `images/${user.uid}/${imageUrl}`);
-        await set(imageRef, { url: imageUrl });
+        const imageRef = ref(database, `images/${user.uid}/${imageId}`);
+        await set(imageRef, { url: uploadResult.secure_url });  
       } else {
         throw new Error(`${response.status}: ${response.statusText}`);
       }

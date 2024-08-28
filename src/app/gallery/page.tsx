@@ -8,9 +8,10 @@ import ImageModal from '../components/imageModel';
 import useAuth from '../hooks/userAuth';
 
 export default function Gallery() {
-    const [images, setImages] = useState<string[]>([]);
+    const [images, setImages] = useState<{ id: string, url: string }[]>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const { user, loading } = useAuth();
+
 
     useEffect(() => {
         if (user) {
@@ -23,14 +24,15 @@ export default function Gallery() {
                     console.log(snapshot);
                     if (snapshot.exists()) {
                         const imagesData = snapshot.val();
-                        const userImages = Object.values(imagesData).map((item: any) => item.url);
+                        console.log(imagesData);
+                        const userImages = Object.entries(imagesData).map(([id, item]: [string, any]) => ({ id, url: item.url }));
                         setImages(userImages);
                     } else {
-                        setImages([]); // No images found
+                        setImages([]);
                     }
                 } catch (error) {
                     console.error('Error fetching images:', error);
-                    setImages([]); // Handle the error by setting empty array
+                    setImages([]);
                 }
             };
 
@@ -53,19 +55,18 @@ export default function Gallery() {
 
     return (
         <div className="min-h-screen py-10">
-
             <div className="container mx-auto px-4">
                 <h1 className="text-3xl font-bold text-center mb-8">Image Gallery</h1>
                 {images.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                        {images.map((src, index) => (
+                        {images.map(({ id, url }, index) => (
                             <div
-                                key={index}
+                                key={id} // Use ID as key
                                 className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer"
-                                onClick={() => handleImageClick(src)}
+                                onClick={() => handleImageClick(url)}
                             >
                                 <Image
-                                    src={src}
+                                    src={url}
                                     alt={`Image ${index + 1}`}
                                     layout="responsive"
                                     width={500}
