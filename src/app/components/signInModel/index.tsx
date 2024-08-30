@@ -12,11 +12,12 @@ interface ModalProps {
 }
 
 const SignInModel: React.FC<ModalProps> = ({ isOpen, onClose, openSignUpModal }) => {
-    if (!isOpen) return null;
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    if (!isOpen) return null;
 
 
     const handleSignIn = async (e: React.MouseEvent) => {
