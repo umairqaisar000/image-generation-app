@@ -9,7 +9,7 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Missing prompt parameter' }, { status: 400 });
         }
 
-        const response = await fetch(`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_IMAGE_GEN_API_URL}${encodeURIComponent(prompt)}`);
         const contentType = response.headers.get('content-type');
 
         if (response.ok) {

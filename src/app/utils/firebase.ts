@@ -4,14 +4,14 @@ import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAWJ8KEwUe7MCcqaZj72olx85jq6kQd7tU",
-    authDomain: "image-generation-app-ce29e.firebaseapp.com",
-    projectId: "image-generation-app-ce29e",
-    databaseURL: "https://image-generation-app-ce29e-default-rtdb.firebaseio.com/",
-    storageBucket: "image-generation-app-ce29e.appspot.com",
-    messagingSenderId: "485985258036",
-    appId: "1:485985258036:web:fe5d5815e0aca2cd67d861",
-    measurementId: "G-BEJHMV34BD"
+    apiKey: process.env.NEXT_PUBLIC_APIKEY,
+    authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+    databaseURL: process.env.NEXT_PUBLIC_DATABASE_UTL,
+    storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_MESSAGEING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 };
 
 // Initialize Firebase
