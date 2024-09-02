@@ -19,7 +19,6 @@ const SignInModel: React.FC<ModalProps> = ({ isOpen, onClose, openSignUpModal })
 
     if (!isOpen) return null;
 
-
     const handleSignIn = async (e: React.MouseEvent) => {
         e.preventDefault();
         setLoading(true);

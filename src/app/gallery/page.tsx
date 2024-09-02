@@ -19,9 +19,7 @@ export default function Gallery() {
                 try {
                     const database = getDatabase();
                     const imagesRef = ref(database, `images/${user.uid}`);
-                    console.log(imagesRef);
                     const snapshot = await get(imagesRef);
-                    console.log(snapshot);
                     if (snapshot.exists()) {
                         const imagesData = snapshot.val();
                         console.log(imagesData);
