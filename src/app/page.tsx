@@ -1,113 +1,88 @@
-import Image from "next/image";
+"use client"
+
+import { cropImage } from "@/utils/imageUtils";
+import { ref, set } from "firebase/database";
+import { useState } from "react";
+import GradientButton from "./components/gradientButton";
+import useAuth from "./hooks/userAuth";
+import { database } from "./utils/firebase";
+
 
 export default function Home() {
+  const [prompt, setPrompt] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { user } = useAuth();
+
+  const generateImage = async () => {
+    try {
+      setIsLoading(true);
+      setImageUrl("");
+
+      if (!user) {
+        throw new Error("User is not authenticated");
+      }
+
+      const response = await fetch(`/api/proxy?prompt=${encodeURIComponent(prompt)}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const croppedBlob = await cropImage(blob, 60);
+
+        const formData = new FormData();
+        formData.append('file', croppedBlob);
+        formData.append('upload_preset', 'gen_images'); // Replace with your upload preset
+
+        const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload image to Cloudinary');
+        }
+
+        const uploadResult = await uploadResponse.json();
+        const imageId = uploadResult.public_id;
+        setImageUrl(uploadResult.secure_url);
+
+        // Save image URL to Firebase
+        const imageRef = ref(database, `images/${user.uid}/${imageId}`);
+        await set(imageRef, { url: uploadResult.secure_url });  
+      } else {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error generating image:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <>
+      <div className="pt-28 pb-10 mt-12">
+        <h1 className="mb-10 text-center text-5xl text-white">Elevate Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-700 via-purple-500 via-blue-600 to-cyan-300 font-bold">Visuals</span> with Real-Time <br></br> Image Generation in seconds</h1>
+        <div className="relative mx-96">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
+            <img src="stars.png"></img>
+          </div>
+          <input type="text" placeholder="Enter a prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} className="block w-full p-4 ps-16 text-sm text-gray-900 border border-gray-300 rounded-3xl bg-gray-50 dark:bg-opacity-50 dark:bg-neutral-900  dark:border-gray-600 dark:placeholder-neutral-400 dark:text-white" />
+          {/* <button type="submit" onClick={generateImage} disabled={isLoading} className="text-white absolute end-0 bottom-0 bg-gradient-to-br from-purple-400 via-blue-700 to-white-200 px-4 py-2 hover:bg-gradient-to-bl font-medium focus:ring-4  text-sm focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-2xl text-sm px-5 py-2.5 text-center me-2 mb-2"</button> */}
+          <GradientButton onClick={generateImage} isLoading={isLoading} text={isLoading ? "Generating..." : "Generate Image"} className="absolute end-0 bottom-0  me-2 mb-2" />
         </div>
+
       </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      {isLoading && (
+        <div className="mt-10 flex justify-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+        </div>
+      )}
+      {imageUrl && !isLoading && (
+        <div className="my-16 flex justify-center">
+          <img src={imageUrl} alt="Generated Image" className="rounded-[2%] shadow-lg border-gray-500 border" />
+        </div>
+      )}
+    </>
   );
 }
