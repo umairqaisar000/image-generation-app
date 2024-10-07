@@ -4,6 +4,7 @@
 import { get, getDatabase, ref } from 'firebase/database';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import NoImageFound from '../../../public/no_image_found.svg';
 import ImageModal from '../components/imageModel';
 import useAuth from '../hooks/userAuth';
 
@@ -76,7 +77,12 @@ export default function Gallery() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-center text-gray-500">No images found.</p>
+                    <div className="flex flex-col justify-center items-center mt-24">
+                        <Image src={NoImageFound} width={300} height={300} alt={""} />
+                        <p className="text-lg font-semibold text-gray-300 mt-10 tracking-wide shadow-md">
+                            It looks like there are no images in this gallery. Check back later!
+                        </p>
+                    </div>
                 )}
                 {selectedImage && (
                     <ImageModal
