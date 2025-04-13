@@ -5,8 +5,8 @@ import { get, getDatabase, ref } from 'firebase/database';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import NoImageFound from '../../../public/no_image_found.svg';
-import ImageModal from '../components/imageModel';
-import useAuth from '../hooks/userAuth';
+import ImageModal from '../ImageModel';
+import useAuth from '../../app/hooks/userAuth';
 
 export default function Gallery() {
     const [images, setImages] = useState<{ id: string, url: string }[]>([]);
