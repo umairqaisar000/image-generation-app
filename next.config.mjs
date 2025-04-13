@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ['cdn.pixabay.com', 'res.cloudinary.com'],
+        domains: [
+            'cdn.pixabay.com',
+            'res.cloudinary.com',
+            'firebasestorage.googleapis.com',
+            'lh3.googleusercontent.com'
+        ],
     },
     async rewrites() {
         return [

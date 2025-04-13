@@ -18,7 +18,7 @@ const GradientButton: React.FC<GradientButtonProps> = ({
             type="button"
             onClick={onClick}
             disabled={isLoading}
-            className={`text-white bg-gradient-to-br from-purple-400 via-blue-700 to-white-200 px-4 py-2 hover:bg-gradient-to-bl font-medium  text-sm font-medium rounded-2xl text-sm px-5 py-2.5 text-center select-none	 ${className}`}
+            className={`py-3 text-white rounded-lg bg-gradient-to-r from-cosmic-purple to-cosmic-blue hover:opacity-90 transition-all font-medium shadow-[0px_0px_10px_4px] shadow-cosmic-purple/40 ${className}`}
         >
             {text}
         </button>
