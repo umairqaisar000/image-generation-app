@@ -6,7 +6,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Image Generator AI",
+  title: "Genera ai",
   description: "Generate stunning images with AI",
 };
 
